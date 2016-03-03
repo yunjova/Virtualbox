@@ -1,2 +1,107 @@
-V1
+<!DOCTYPE html>
+<html lang="en" class="jovaDark">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Install Sming on Linux Ubuntu Server in Virtualbox on Windows 10</title>
+
+		<meta name="description" content="Sensor / Actuator Nodes based on MySensors and MCC" />
+		<meta name="keywords" content="MCC, Arduino, ESP8266, RaspberryPi, Domotica, Home Automation, MySensors" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico"> 
+
+		<link rel="stylesheet" type="text/css" href="resources/jovaDark.css" />
+	</head>
+	<body>
+		<div class="container">
+		
+			<section class="main">
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<div class="DocumentTitle">Install Sming on Linux Ubuntu Server in Virtualbox on Windows 10
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Virtualbox.</h1>
+<pre>
+<a target="newTarget" href="https://www.virtualbox.org/wiki/Downloads">https://www.virtualbox.org/wiki/Downloads</a>
+  Download VirtualBox
+
+<a target="newTarget" href="http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe">http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe</a>
+  VirtualBox-5.0.14-105127-Win.exe
+
+The extension pack(s) is/are not needed.
+
+After download: De handtekening van VirtualBox-5.0.14-105127-Win.exe is beschadigd of ongeldig.
+Says EDGE browser. Later found out that this is a false positive, other browsers do not repport this.
+
+Do a SHA check:
+
+Get the checksum from:
+<a target="newTarget" href="https://www.virtualbox.org/download/hashes/5.0.14/SHA256SUMS">https://www.virtualbox.org/download/hashes/5.0.14/SHA256SUMS</a>
+63b4ac2c308300406a9fa04470b69606c430ac9f62690a9243e36d22f991296e *VirtualBox-5.0.14-105127-Win.exe
+
+How:
+<a target="newTarget" href="https://www.openoffice.org/download/checksums.html#hash_win">https://www.openoffice.org/download/checksums.html#hash_win</a>
+
+Use: <a target="newTarget" href="http://www.krylack.com/file-checksum-tool/">http://www.krylack.com/file-checksum-tool/</a>
+  File Checksum Tool
+  Download gives: hashtool.exe is een onveilige download en is geblokkeerd door het SmartScreen-filter.
+
+Alternative: <a target="newTarget" href="https://kanguru.zendesk.com/entries/21747773-SHA256-Checksum-Utility">https://kanguru.zendesk.com/entries/21747773-SHA256-Checksum-Utility</a>
+  SHA256 Checksum Utility
+  This one is accepted.
+  Move to C:\DTFB\ProgramFiles\sha256sum\sha256sum.exe
+  cd \DTFB\ProgramFiles\sha256sum
+  sha256sum.exe C:\Users\Johan\Downloads\VirtualBox-5.0.14-105127-Win.exe
+
+C:\DTFB\ProgramFiles\sha256sum>  sha256sum.exe C:\Users\Johan\Downloads\VirtualBox-5.0.14-105127-Win.exe
+\63b4ac2c308300406a9fa04470b69606c430ac9f62690a9243e36d22f991296e *C:\\Users\\Johan\\Downloads\\VirtualBox-5.0.14-105127-Win.exe
+
+This is the same value as retrieved from the Virtual box website.
+PASS
+
+Launch the Virtualbox installer (Ignore the SmartScreen error which is false positive).
+  Double-click VirtualBox-5.0.14-105127-Win.exe
+  Install USB stuff.
+  PASS
+</pre>
+
+
+
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<br>
+<div class="footer">
+Copyright: 2016 - Johan Vanroose
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+			</section>
+
+
+
+		</div>
+
+
+
+	</body>
+</html>
+
+
+
 
