@@ -1,0 +1,396 @@
+html { height: 100%; }
+
+
+
+.jovaDark body {
+  font-family: Arial;
+	background: #333;
+}
+
+
+
+.main {
+	/* width: 100%; */
+	/* max-width: 960px; */
+	/* padding: 40px; */
+  padding-top: 10px;
+  padding-right: 40px;
+  padding-bottom: 10px;
+  padding-left: 40px;
+	/* text-shadow: 0 2px 0 rgba(255,255,255,0.7); */
+}
+
+/*
+.main p {
+	font-size: 16px;
+	line-height: 1.4;
+	text-align: justify;
+}
+*/
+
+/*
+.main p:nth-of-type(2){
+	-moz-column-count: 2;
+	-moz-column-gap: 20px;
+	-webkit-column-count: 2;
+	-webkit-column-gap: 20px;
+	-ms-column-count: 2;
+	-ms-column-gap: 20px;
+	-o-column-count: 2;
+	-o-column-gap: 20px;
+	column-count: 2;
+	column-gap: 20px;
+}
+
+.main p:nth-of-type(4){
+	-moz-column-count: 3;
+	-moz-column-gap: 15px;
+	-o-column-count: 3;
+	-o-column-gap: 15px;
+	-ms-column-count: 3;
+	-ms-column-gap: 15px;
+	-webkit-column-count: 3;
+	-webkit-column-gap: 15px;
+	column-count: 3;
+	column-gap: 15px;
+}
+*/
+
+.jovaDark .main p { 
+	color: #eee;
+	text-shadow: none;
+}
+
+.jovaDark .main li { 
+	color: #eee;
+	text-shadow: none;
+}
+
+
+
+/* DEMO 3 */
+
+/* Draw a small rectangle before the heading text. Need to adapt the padding then aswell, see below. */
+/*
+.jovaDark .main h2:after, 
+.jovaDark .main h3:after, 
+.jovaDark .main h4:after,
+.jovaDark .main h5:after,
+.jovaDark .main h6:after {
+	position: absolute;
+	content: "";
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 15px;
+	border-radius: 0px;
+	box-shadow: 
+		inset 0 1px 1px rgba(0,0,0,0.5), 
+		0 1px 1px rgba(255,255,255,0.3);
+}
+.jovaDark .main h2:after { background: #6Cf; }
+.jovaDark .main h3:after { background: #6Cf; }
+.jovaDark .main h4:after { background: #6Cf; }
+.jovaDark .main h5:after { background: #6Cf; }
+.jovaDark .main h6:after { background: #6Cf; }
+*/
+
+
+.DocumentTitle {
+	font-size: 48px;
+	line-height: 56px;
+	margin: 1em 0 .6em 0;
+	font-weight: normal;
+	color: white;
+	font-family: 'Hammersmith One', sans-serif;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+	position: relative;
+	color: #6Cf;
+  text-align: center;
+  border: 1px solid red;
+}
+
+.jovaDark .main h1 {
+	font-size: 36px;
+	line-height: 40px;
+	margin: 1em 0 .6em 0;
+	font-weight: normal;
+	color: white;
+	font-family: 'Hammersmith One', sans-serif;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+	position: relative;
+	color: #6Cf;
+  border-bottom: 1px solid red;
+}
+
+.jovaDark .main h2 {
+	margin: 1em 0 .6em 0;
+	padding: 0 0 0 0px;
+	/*padding: 0 0 0 20px; // When using the rectangle in front of the heading text. */
+	font-weight: normal;
+	color: white;
+	font-family: 'Hammersmith One', sans-serif;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+	position: relative;
+	font-size: 30px;
+	line-height: 40px;
+	color: #6Cf;
+  border-bottom: 1px solid #666666;
+}
+
+.jovaDark .main h3 {
+	margin: 1em 0 .6em 0;
+	padding: 0 0 0 0px;
+	/*padding: 0 0 0 20px; // When using the rectangle in front of the heading text. */
+	font-weight: normal;
+	color: white;
+	font-family: 'Hammersmith One', sans-serif;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+	position: relative;
+	font-size: 24px;
+	line-height: 30px;
+	font-family: 'Questrial', sans-serif;
+	color: #6Cf;
+  border-bottom: 1px solid #666666;
+}
+
+.jovaDark .main h4 { 
+	margin: 1em 0 .6em 0;
+	padding: 0 0 0 0px;
+	/*padding: 0 0 0 20px; // When using the rectangle in front of the heading text. */
+	font-weight: normal;
+	color: white;
+	font-family: 'Hammersmith One', sans-serif;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+	position: relative;
+	font-size: 18px;
+	line-height: 20px;
+	font-family: 'Questrial', sans-serif;
+	color: #6Cf;
+  border-bottom: 1px solid #555555;
+}
+
+.jovaDark .main h5 { 
+	margin: 1em 0 .6em 0;
+	padding: 0 0 0 0px;
+	/*padding: 0 0 0 20px; // When using the rectangle in front of the heading text. */
+	font-weight: normal;
+	color: white;
+	font-family: 'Hammersmith One', sans-serif;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+	position: relative;
+	font-size: 18px;
+	line-height: 20px;
+	font-family: 'Questrial', sans-serif;
+	color: #6Cf;
+}
+
+.jovaDark .main h6 { 
+	margin: 1em 0 .6em 0;
+	padding: 0 0 0 0px;
+	/*padding: 0 0 0 20px; // When using the rectangle in front of the heading text. */
+	font-weight: normal;
+	color: white;
+	font-family: 'Hammersmith One', sans-serif;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+	position: relative;
+	font-size: 18px;
+	line-height: 20px;
+	font-family: 'Questrial', sans-serif;
+	color: #6Cf;
+}
+
+
+
+/* CSS Counters */
+
+.jovaDark .main {
+	counter-reset: section-1 section-2 section-3 section-4 section-5 section-6;
+}
+
+.jovaDark .main h1 {
+	counter-increment: section-1;
+	counter-reset: section-2 section-3 section-4 section-5 section-6;
+}
+
+.jovaDark .main h2 {
+	counter-increment: section-2;
+	counter-reset: section-3 section-4 section-5 section-6;
+}
+
+.jovaDark .main h3 {
+	counter-increment: section-3;
+	counter-reset: section-4 section-5 section-6;
+}
+
+.jovaDark .main h4 {
+	counter-increment: section-4;
+	counter-reset: section-5 section-6;
+}
+
+.jovaDark .main h5 {
+	counter-increment: section-5;
+	counter-reset: section-6;
+}
+
+.jovaDark .main h6 {
+	counter-increment: section-6;
+}
+
+.jovaDark .main h1:before { content: counter(section-1) ". "; }
+.jovaDark .main h2:before { content: counter(section-1) "." counter(section-2) ". "; }
+.jovaDark .main h3:before { content: counter(section-1) "." counter(section-2) "." counter(section-3) ". "; }
+.jovaDark .main h4:before { content: counter(section-1) "." counter(section-2) "." counter(section-3) "." counter(section-4) ". "; }
+.jovaDark .main h5:before { content: counter(section-1) "." counter(section-2) "." counter(section-3) "." counter(section-4) "." counter(section-5) ". "; }
+.jovaDark .main h6:before { content: counter(section-1) "." counter(section-2) "." counter(section-3) "." counter(section-4) "." counter(section-5) "." counter(section-6) ". "; }
+
+
+
+/* Order of declaration is important. */
+/* unvisited link */
+a:link {
+    color: #6CF;
+}
+
+/* visited link */
+a:visited {
+    color: #66CCFF;
+}
+
+/* mouse over link */
+a:hover {
+    color: #ADD8E6;
+}
+
+/* selected link */
+a:active {
+    color: yellow;
+}
+
+
+
+.jovaDark .main pre {
+  width: 98%;
+  max-height: 400px;
+  color: #dddddd;
+  padding: 10px;
+  background: #666666;
+  border: 1px solid #000000;
+  border-radius: 0px;
+  word-wrap: normal;
+  overflow: auto;
+}
+
+
+/* CSS rules for the pre scrollbar */
+/* Only works in IE. */
+/*
+.jovaDark .main pre {
+	scrollbar-3dlight-color:gold;
+	scrollbar-arrow-color:yellow;
+	scrollbar-base-color:tomato;
+	scrollbar-darkshadow-color:orange;
+	scrollbar-face-color:teal;
+	scrollbar-highlight-color:hotpink;
+	scrollbar-shadow-color:magenta;
+}
+*/
+
+/* Only works in Chrome, only vertical scrollbar. */
+/*
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+    border-left: 1px solid #ccc;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+*/
+
+
+
+		/* footer */
+		.footer {
+			background-color: #666666;
+			color: #eeeeee;
+      padding-right:15px;
+      line-height:40px;
+    	text-align: right;
+		}
+
+
+
+/* Table */
+table { 
+  color: #EEEEEE;
+  font-family: Helvetica, Arial, sans-serif;
+  width: 640px;
+  /* Table reset stuff */
+  border-collapse: collapse; border-spacing: 0; 
+}
+		
+td, th { border: 1px solid #888888; height: 30px; }
+			
+th {
+  background: #333333;
+	color: #EEEEEE; font-weight: bold;
+	height: 40px;
+}
+		
+td { background: #333333; text-align: center; }
+
+/* Zebra Stripe Rows */
+		
+tr:nth-child(even) td { background: #555555; } 
+tr:nth-child(odd) td { background: #666666; }
+
+/* First-child blank cells! */
+tr td:first-child, tr th:first-child { 
+	background: none; 
+	font-style: italic;
+	font-weight: bold;
+	font-size: 14px;
+	text-align: right;
+	padding-right: 10px;
+	width: 80px; 
+  border: none;
+}
+
+/* Last-child blank cells! */
+/*
+tr td:last-child, tr th:last-child { 
+	background: none; 
+	font-style: italic;
+	font-weight: bold;
+	font-size: 14px;
+	text-align: right;
+	padding-right: 10px;
+	width: 80px; 
+  border: none;
+}
+*/
+
+/* Add border-radius to specific cells! */
+/*
+tr:first-child th:nth-child(2) { 
+  border-radius: 5px 0 0 0;
+  border: none;
+} 
+
+tr:first-child th:nth-last-child(2) { 
+  border-radius: 0 5px 0 0; 
+  border: none;
+}
+*/
+
+/* End table */
+
+
+
+
