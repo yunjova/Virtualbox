@@ -28,54 +28,249 @@
 
 
 <!-- ----------------------------------------------------------------------- -->
-<h1>Virtualbox.</h1>
+<h1>Introduction.</h1>
+<p>Use Virtualbox on Windows to create a Linux machine to do development for the sensor network.
+
+<p>This page describes the setup of a Linux virtual machine to be able to development for the sensor network on Linux even if you only have a Windows real machine. The advantage is that a person with a Windows machine can develop using the same environment as the rest of the group.
+
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Components.</h1>
+<ul>
+  <li>Oracle Virtualbox (<a target="newTarget" href="http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe">http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe</a>). The extension pack is not needed.
+  <li>Ubuntu Server 1404LTS (<a target="newTarget" href="http://www.ubuntu.com/download/server">http://www.ubuntu.com/download/server</a> ubuntu-14.04.3-server-amd64.iso) I used Ubuntu Server (not Desktop) because the esp-open-sdk developers use this OS.
+  <li>ESP Open SDK (<a target="newTarget" href="https://github.com/pfalcon/esp-open-sdk">https://github.com/pfalcon/esp-open-sdk</a>) Recommended in <a target="newTarget" href="http://www.esp8266.com/wiki/doku.php?id=toolchain">http://www.esp8266.com/wiki/doku.php?id=toolchain</a>.
+</ul>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Steps to do the setup to have a VM as development machine.</h1>
+
+<p>A note in advance: You can always backup the VM, see below: "Backup the VM using Clone".
+
+<h2>Hardware acceleration on the host machine.</h2>
 <pre>
-<a target="newTarget" href="https://www.virtualbox.org/wiki/Downloads">https://www.virtualbox.org/wiki/Downloads</a>
-  Download VirtualBox
+Start Virtualbox
+VT-x/AMD-V hardwareversnelling is niet beschikbaar op uw systeem. Uw 64-bit gast zal geen 64-bit CPU detecteren en niet in staat zijn op te starten.
+I checked with CPU-Z, my CPU has VT-x.
+Rebooted the laptop. Now it works again.
 
-<a target="newTarget" href="http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe">http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe</a>
-  VirtualBox-5.0.14-105127-Win.exe
 
-The extension pack(s) is/are not needed.
 
-After download: De handtekening van VirtualBox-5.0.14-105127-Win.exe is beschadigd of ongeldig.
-Says EDGE browser. Later found out that this is a false positive, other browsers do not repport this.
-
-Do a SHA check:
-
-Get the checksum from:
-<a target="newTarget" href="https://www.virtualbox.org/download/hashes/5.0.14/SHA256SUMS">https://www.virtualbox.org/download/hashes/5.0.14/SHA256SUMS</a>
-63b4ac2c308300406a9fa04470b69606c430ac9f62690a9243e36d22f991296e *VirtualBox-5.0.14-105127-Win.exe
-
-How:
-<a target="newTarget" href="https://www.openoffice.org/download/checksums.html#hash_win">https://www.openoffice.org/download/checksums.html#hash_win</a>
-
-Use: <a target="newTarget" href="http://www.krylack.com/file-checksum-tool/">http://www.krylack.com/file-checksum-tool/</a>
-  File Checksum Tool
-  Download gives: hashtool.exe is een onveilige download en is geblokkeerd door het SmartScreen-filter.
-
-Alternative: <a target="newTarget" href="https://kanguru.zendesk.com/entries/21747773-SHA256-Checksum-Utility">https://kanguru.zendesk.com/entries/21747773-SHA256-Checksum-Utility</a>
-  SHA256 Checksum Utility
-  This one is accepted.
-  Move to C:\DTFB\ProgramFiles\sha256sum\sha256sum.exe
-  cd \DTFB\ProgramFiles\sha256sum
-  sha256sum.exe C:\Users\Johan\Downloads\VirtualBox-5.0.14-105127-Win.exe
-
-C:\DTFB\ProgramFiles\sha256sum>  sha256sum.exe C:\Users\Johan\Downloads\VirtualBox-5.0.14-105127-Win.exe
-\63b4ac2c308300406a9fa04470b69606c430ac9f62690a9243e36d22f991296e *C:\\Users\\Johan\\Downloads\\VirtualBox-5.0.14-105127-Win.exe
-
-This is the same value as retrieved from the Virtual box website.
-PASS
-
-Launch the Virtualbox installer (Ignore the SmartScreen error which is false positive).
-  Double-click VirtualBox-5.0.14-105127-Win.exe
-  Install USB stuff.
-  PASS
+Saturday
+Reboot HPTOVO4.
+Again VT-x missing (virtualization).
+Why is it sometimes working and sometimes not?
+Check the BIOS. Virtualization was not enbled, enable it.
+Now the question pops up: Why did it work sometimes?
 </pre>
 
 
 
 
+<h2>Install Virtualbox.</h2>
+<p>Launch the Virtualbox installer. Follow the instructions.
+<p>Make sur you install USB stuff.
+
+<h2>Install Ubuntu Server.</h2>
+
+<h3>Create a new machine.</h3>
+<ul>
+  <li>Launch Virtualbox
+    <pre>
+    </pre>
+
+  <li>Click New machine
+    <p>Check/fill in parameters as shown below:
+    <pre>
+  Name: Ubuntu1404LTS
+  Type: 64-bit
+  RAM: 768 MB (== the default, which I kept. It seems 348 MB would also have been OK)
+  Add new virtual disk (default is 8 GB)
+  Type: VDI
+  Allcation type: Change to Fixed (longer to create, faster to use)
+  Changed size to: 16 GB (from 8GB default)
+    Comes in: C:\Users\USER\VirtualBox VMs\Ubuntu1404LTS\Ubuntu1404LTS.vdi.
+    </pre>
+
+  <p>The machine is created and in power-off state.
+
+  <li>Select Ubuntu install CD
+    <pre>
+  Select Settings
+  Select Storage
+  Add new storage connection
+    Virtual Optical Station
+    Choose the downloaded Ubuntu.iso file.
+  System boot order: Put Optical drive on top.
+  Close the settings window.
+    </pre>
+
+  <li>Start the machine
+    <p>Messages: <code>Auto keyboard capture is turned on</code>. <code>Host OS supports mouse integration</code>.
+    <pre>
+  Select language: English
+  Install Ubuntu Server
+  English
+  Europe Belgium
+  Locale settings: United States
+  Keyboard: Belgian, Belgian
+    </pre>
+
+    <pre>
+  Hostname: ESPDEV
+  Full name for the user: Johan
+  Account name: johan
+  Encrypt home directory: No
+  Timezone: Europe/Brussels
+  Partitioning method: Guided - use entire disk and set up LVM
+  Partition size: I selected the maximum available size. TODO: Check if selecting a part would have been better. This will give more flexibility. But how much to choose then?
+  Results: 
+  Write to disk: Yes
+  HTTP Proxy: Left blank
+  No automatic updates
+    </pre>
+
+  <li>Additional software to install
+    <pre>
+  OpenSSH server
+    </pre>
+
+    <pre>
+  Install GRUB: Yes
+    </pre>
+
+  <p>The machine reboots now.
+    <br>Apparantly the .iso file is not mounted anymore and the machine boots from the VHD. OK
+
+  <li>Get the newest software
+    <p>Note see below for how to "Avoid to have to type password at each sudo".
+    <pre>
+  sudo apt-get update
+  sudo apt-get dist-upgrade
+    </pre>
+
+  <li>Verify USB devices
+    <pre>
+  Devices -> USB
+    </pre>
+    <p>USB devices are seen (also the NodeMCU device).
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Avoid to have to type password at each sudo.</h1>
+  <pre>
+  sudo visudo
+  
+  Changed
+  %admin ALL=(ALL) ALL
+  to
+  %admin ALL=(ALL) NOPASSWD: ALL
+  
+  # Allow members of group sudo to execute any command
+  Changed
+  %sudo   ALL=(ALL:ALL) ALL
+  to
+  %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+  </pre>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Backup the VM using Clone.</h1>
+<p>You can clone the machine as a backup.
+<ul>
+  <li>First shutdown the VM
+    <pre>
+   sudo sutdown - h now
+    </pre>
+
+  <li>With the clone feature of Virtualbox (it takes & while to complete!). (You could also copy the .vbox and .vdi files)
+    <pre>
+  Machine -> Clone
+    Name: Ubuntu1404LTS Clone BU 02
+    I selected to give new MAC addresses, so it is also another machine.
+    Full clone.
+    </pre>
+</ul>
+  <p>Note: The virtual machine is stored in: <code>C:\Users\USER\VirtualBox VMs\Ubuntu1404LTS Clone BU 02</code>
+  <p>You still need to update the hostname (and maybe other things?) to have another machine.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Update/Upgrade.</h1>
+
+<p>I first do an udpate/upgrade.
+    <pre>
+  sudo apt-get update
+  sudo apt-get upgrade
+  sudo apt-get dist-upgrade
+    </pre>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>SSH into the new VM (SSH access to the Guest).</h1>
+<p>With PuTTY, make an SSH connection to the VM.
+<p>This fails altough the SSH server is running and is accepting connections.
+<pre>
+Is the SSH server running?
+ps -A | grep -i ssh
+PASS: Yes
+
+VM:
+Does the SSH server listen for incoming connections?
+sudo ss -lnp | grep sshd
+PASS: Two lines on port 22 (IPv4 and IPv6)
+
+Try to connect from the VM to the VM.
+ssh -v localhost
+PASS: I can login.
+
+Leave the session.
+exit
+
+Firewall tables
+VM:
+iptables -nvl INPUT
+</pre>
+
+<p>So on the VM side all looks OK. What is wrong? 
+<p>The reason the that the default type of network port is NAT.
+<p>You must first define port forwarding.
+<pre>
+Define Port Fowarding
+Network -> Advanced -> Port Forwarding
+Add one entry:
+127.0.0.1:2222 to 10.0.2.15:22
+Restart the VM
+PuTTY to 127.0.0.1:2222
+PASS: Connected to ssh server.
+</pre>
+
+<p>Even better is to configure a Brigded type adapter instead of a NAT adapter. Then the VM is, from the network perspective, connected in the "normal" way.
+  <br>See: Configure a Bridged Adapter on the VM
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Configure Bridged a Adapter on the VM.</h1>
+<p>Important: The Bridged adapter (2nd one in my case) only gets an IP address when I disable the NAT Adapter (1st one in my case). So disable the NAT adapter.
+<p>Connected with PuTTY SSH to port 22: PASS.
+<p>Internet access from VM (ping www.google.com): PASS.
+<p>Connection between host and guest (ping from each other): PASS.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>ch.</h1>
+<pre>
+</pre>
 
 
 <!-- ----------------------------------------------------------------------- -->
