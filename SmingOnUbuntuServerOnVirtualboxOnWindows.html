@@ -50,14 +50,343 @@
 <!-- ----------------------------------------------------------------------- -->
 <h1>Create a Vitual Machine with Ubuntu Server.</h1>
 
-<p>See:
+<p>See: <a target="newTarget" href="UbuntuServerOnVirtualboxOnWindows.html">UbuntuServerOnVirtualboxOnWindows.html</a>
 
 
 
 <!-- ----------------------------------------------------------------------- -->
-<h1>Install Sming and dependencies (SDK/UDK).</h1>
+<h1>Install ESP8266 development environment (Sming and dependencies).</h1>
 
-<p>TODO: To be completed.
+<p>Basically I followed: <a target="newTarget" href="https://github.com/SmingHub/Sming/wiki/Linux-Quickstart">https://github.com/SmingHub/Sming/wiki/Linux-Quickstart</a>
+  Sming - Linux Quickstart
+  but with some changes:
+  <ul>
+    <li>ERROR: libtool-bin has no installation candidate (Only for Kubuntu? So omitted this.)
+    <li>build-essential was missing in the prerequisites (On Ubuntu <b>server</b>)
+  </ul>
+
+<p>Steps:
+<ul>
+  <li>Install prerequisites
+  <pre>
+  sudo apt-get update
+
+  sudo apt-get install make unrar autoconf automake libtool gcc g++ gperf flex bison texinfo gawk ncurses-dev libexpat-dev python sed python-serial srecord bc git
+  </pre>
+
+  <li>Prepare directory
+  <pre>
+  mkdir -p /opt/
+  cd /opt/
+  </pre>
+
+  <li>Build esp-open-sdk (Or get precompiled esp-open-sdk (64-bit) or (32-bit))
+  <pre>
+  sudo git clone https://github.com/pfalcon/esp-open-sdk.git
+  cd esp-open-sdk
+  sudo make STANDALONE=y # It will take a while...
+  </pre>
+  <p>ERROR
+
+  <p>Dependencies were missing:
+  <p>Follow parts of: <a target="newTarget" href="http://www.penninkhof.com/2015/03/esp8266-open-sdk/">http://www.penninkhof.com/2015/03/esp8266-open-sdk/</a>
+  <li>Install additionally needed dependencies
+  <pre>
+  sudo apt-get install build-essential
+
+  # Are these needed? (I have installed them):
+  #sudo apt-get -y install libncurses5-dev wget libc6-dev-amd64 dpkg-dev 
+  </pre>
+
+  <li>Do clean/update:
+  <pre>
+  cd /opt/esp-open-sdk
+  make clean
+  git pull
+  git submodule update
+  </pre>
+
+  <li># Install the esp-open-sdk toolchain
+  <pre>
+  cd /opt
+  sudo rm -rf esp-open-sdk
+  sudo git clone https://github.com/pfalcon/esp-open-sdk.git
+  sudo chown -R USER esp-open-sdk
+  cd esp-open-sdk
+  make STANDALONE=y
+
+  <li>Paths:
+  <pre>
+  echo 'PATH=$PATH:/opt/esp-open-sdk/xtensa-lx106-elf/bin' >> ~/.profile
+  PATH=$PATH:/opt/esp-open-sdk/xtensa-lx106-elf/bin
+
+  echo 'PATH=$PATH:/opt/esp-open-sdk/esptool' >> ~/.profile
+  PATH=$PATH:/opt/esp-open-sdk/esptool
+  </pre>
+
+  <li>Environment variables:
+  <pre>
+  echo 'export ESP_HOME=/opt/esp-open-sdk' >> ~/.profile
+  export ESP_HOME=/opt/esp-open-sdk
+
+  echo' export SMING_HOME=~/Sming/Sming' >> ~/.profile
+  export SMING_HOME=~/Sming/Sming
+  </pre>
+
+  <li>Get and Build Sming Core:
+  <pre>
+  cd ~
+  git clone https://github.com/SmingHub/Sming.git
+  cd Sming/Sming
+  make
+  </pre>
+
+  <li>Build spiffy (if required):
+  <pre>
+  cd ~/Sming/Sming
+  make spiffy
+  <pre>
+
+  <li>Install esptool.py:
+  <pre>
+  cd ~
+  sudo apt-get install python-serial unzip
+  wget https://github.com/themadinventor/esptool/archive/master.zip
+  unzip master.zip
+  mv esptool-master /opt/esp-open-sdk/esptool
+  rm master.zip
+  </pre>
+
+  <li>Get esptool2 from <a target="newTarget" href="https://github.com/raburton/esptool2">https://github.com/raburton/esptool2</a>
+  <pre>
+  cd ~
+  git clone https://github.com/raburton/esptool2.git
+  cd esptool2
+  make
+  sudo cp esptool2 /usr/bin
+  </pre>
+
+  <li>Verify toolchain.
+  <p>Build a 'Basic Blink' example:
+  <pre>
+  cd ~/Sming/samples/Basic_Blink
+  make
+  </pre>
+  <p>PASS: 0x00000.bin and 0x09000.bin exist.
+
+  <p>Must use DIO iso QIO
+    <br>Must edit Makefile-user.mk
+  <pre>
+  Change
+  # SPI_MODE = dio
+  to
+  SPI_MODE = dio
+  </pre>
+
+  <li>Build and flash a 'Basic Blink' example (using ttyUSB0):
+  <pre>
+  cd ~/Sming/samples/Basic_Blink
+  make flash
+  </pre>
+
+  <p>When: FAIL: Cannot connect, not found.
+  <pre>
+  # Check USB Devices
+  lsusb
+  </pre>
+  <p>Configure:
+  <pre>
+  Apparaten -> USB -> Instellingen USB -> Add filter: CP210x
+  </pre>
+
+  <p>When: FAIL: Permission denied
+    <br>Need to add my account to the user group dialout.
+  <pre>
+  ls -l /deb/ttyUSB0
+  sudo adduser USER dialout
+  </pre>
+
+  <p>When: FAIL: Still: Permission denied
+  <p>Remove and re-insert the NodeMCU from the USB port with the flash button pressed.
+  <p>Reboot the Linux guest.
+  <pre>
+  ls -l /deb/ttyUSB0
+  </pre>
+
+  <p>PASS: Code gets downloaded.
+  <p>Terminal opens.
+
+  <p>When LED does not blink: power-cycle the NodeMCU/ESP8266.
+
+</ul>
+
+<p>Hit the reset (RST) button on the NodeMCU.
+  <br>FAIL: Nothing happens.
+  <br>QUESTION: What made this button dead?
+
+<p>OK, Can use this to develop for the ESP8266.
+
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<hr>
+<p>Below here is MySensorsGateWay procedure based.
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<h1>Build and Flash the MySensorsGateWay.</h1>
+
+<p>Follow <a target="newTarget" href="https://github.com/WSNhub/MySensorsGateway/wiki/The-Smart-Gateway">https://github.com/WSNhub/MySensorsGateway/wiki/The-Smart-Gateway</a> from chapter "Serial connection to the ESP" on.
+
+<h2>Serial connection to the ESP</h2>
+
+<p>I skipped this because I have already pyserial. See higher up I installed already python-serial and this look the same/related.
+<pre>
+johan@ESPDEV:~$ dpkg --list | grep -i serial
+ii  python-serial                       2.6-1build1                      all          pyserial - module encapsulating access for the serial port
+</pre>
+
+<p>SKIPPED:
+<p>When flashing is complete, a serial connection to the ESP will be set up. This allows you to enter commands to for example check the state of the ESP. The tool used for that is a python tool which probably is not installed on your system yet. First we are going to install pip for python, a tool that lets you easily install python extensions:
+<pre>
+    sudo apt-get install python-pip
+</pre>
+
+<p>Next we install the actual pyserial extension:
+<pre>
+    sudo pip install pyserial --upgrade
+</pre>
+
+<p>More information on this topic can be found on the adafruit website: <a target="newTarget" href="https://learn.adafruit.com/arduino-lesson-17-email-sending-movement-detector/installing-python-and-pyserial">https://learn.adafruit.com/arduino-lesson-17-email-sending-movement-detector/installing-python-and-pyserial</a>
+
+<p>So what I don't have is <code>python-pip</code>.
+
+
+
+<h2>Building the firmware</h2>
+<p>Building the firmware can be done in a few steps. First of all the repository should be cloned.
+<pre>
+    From my home directory:
+    mkdir MCC
+    cd MCC
+    git clone https://github.com/WSNhub/MySensorsGateway.git
+</pre>
+
+<p>Next step is to fetch all libraries like Sming, the MySensors and SD card library. This is automatically done when executing the setup script.
+<pre>
+    cd MySensorsGateway
+    ./setup.sh
+</pre>
+
+<p>Now that the setup is done, a simple "make" will build the source. When this is done, the 3 firmware files are ready.
+<pre>
+    make
+</pre>
+
+
+
+<h3>Common pitfalls</h3>
+<p>sudo adduser YOUR_USER dialout
+<p>I already did: sudo adduser johan dialout
+
+
+
+<h2>Flashing the firmware</h2>
+
+<p>Connect the NodeMCU to the HPTOVO4.
+
+<p>Check USB devices.
+<pre>
+johan@ESPDEV:~/MCC/MySensorsGateway$ lsusb
+Bus 001 Device 003: ID 10c4:ea60 Cygnal Integrated Products, Inc. CP210x UART Bridge / myAVR mySmartUSB light
+Bus 001 Device 002: ID 80ee:0021 VirtualBox USB Tablet
+Bus 001 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+</pre>
+<p>PASS: CP210x is there.
+
+<p>The first time an ESP8266 needs to be flashed via an USB cable. A simple "make flash" will transfer the images by using esptool, a tool that is incorporated in the toolchain. Do note that on WeMos the flashing does not need any extra hardware manipulation while on other platforms it might be necessary to press a flash button while resetting the module. Once you found out what manipulation is needed, flashing comes down to:
+<pre>
+    make flash
+</pre>
+
+
+
+<p>It is also possible to do the flashing manually bu using esptool directly. It is however important to use the correct arguments here.
+<pre>
+/opt/esp-open-sdk/esptool/esptool.py -p /dev/ttyUSB0 -b 115200 write_flash -ff 40m -fm qio -fs 32m 0x00000 out/firmware/rboot.bin 0x02000 out/firmware/rom0.bin 0x100000 out/firmware/spiff_rom.bin
+</pre>
+<p>This is execatly the same command as was launched by <code>make flash</code> on my system.
+
+<p>JOVA: TODO: Now the default value of QIO iso DIO was used and all looks OK. So what about the need for DIO?
+
+<p>After that the firmware can be flashed over-the-air. The gateway will download the firmware via HTTP from a webserver.
+
+
+
+<p>It is possible to use the opened terminal. Enter help, info, ...
+
+<p>Reset the NodeMCU and see the log on the terminal. See file:
+
+
+<p>Quit the terminal with CTRL - Alt - ]
+  <br>Note: NOT Alt-Gr!!!
+
+
+
+After flashing a connection to the serial interface is automatically attempted. There is however a way to connect manually:
+
+python -m serial.tools.miniterm /dev/ttyUSB0 115200
+When connecting fails (on modules with a cheap USB chip) a workaround that might work is:
+
+python -m serial.tools.miniterm /dev/ttyUSB0 9600
+<ctrl>]
+python -m serial.tools.miniterm /dev/ttyUSB0 115200
+
+
+
+<h2>The web configuration interface</h2>
+
+<p>When the system starts it starts an access point and starts a webserver. The SSID of the access point is built out of "MySensors gateway " and the unique id of this system "System Chip ID : dc0f28". In the above example this results in "MySensors gateway dc0f28". Currently there is no way to change that, but it could be added. By default there is no password so you can connect to it and use the ip 192.168.4.1 for http and telnet. The web configuration will allow you to set up your network configuration, an AP password and MQTT settings. When all is set up properly the gateway can connect to an MQTT server in order to communicate with the controller.
+
+<p>With the Wifi configuration on my HPTOVO4, check available networks.
+<p>"MySensors gateway 23389" exists.
+
+
+
+<p>With tablet, connect to network "MySensors gateway 23389".
+<p>Surf to: 192.168.4.1
+  <br>PASS: Configuration page shows.
+
+
+<p>Configure SSID and password of jefke524. Click Verzenden.
+<p>Check BBOX router.
+  <br>PASS: ESP_023389 is connected. The NodeMCU has an IP address.
+
+
+<pre>
+Start Sensor Node.
+
+
+Start HiveMQ on HPTOVO4, wait a minute. Allow firewall...
+
+
+Configure MQTT parameters in the gateway:
+Now surf via the jefke524 network to 192.168.1.167 (== the gatewap IP address)
+IP Address fo MQTT server: IP address of HPTOVO4
+Port of MQTT server: 1883
+
+
+Start TT3 MQTT Client for test.
+Connect to HiveMQ.
+Subscribe to #
+The result:
+See repeated messages every minute, coming from the gateway:
+- /ESP_00023389/version
+- /memory
+</pre>
 
 
 
