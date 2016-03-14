@@ -330,7 +330,7 @@ a:active {
 table { 
   color: #EEEEEE;
   font-family: Helvetica, Arial, sans-serif;
-  width: 640px;
+  width: 800px;
   /* Table reset stuff */
   border-collapse: collapse; border-spacing: 0; 
 }
@@ -362,6 +362,11 @@ tr td:first-child, tr th:first-child {
   border: none;
 }
 
+/* Last-child align left. */
+tr td:last-child, tr th:last-child {
+  text-align: left;
+}
+
 /* Last-child blank cells! */
 /*
 tr td:last-child, tr th:last-child { 
@@ -390,7 +395,6 @@ tr:first-child th:nth-last-child(2) {
 */
 
 /* End table */
-
 
 
 
