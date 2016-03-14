@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" class="jovaDark">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Build and Install the MCC MySensorsGateWay</title>
+
+		<meta name="description" content="Sensor / Actuator Nodes based on MySensors and MCC" />
+		<meta name="keywords" content="MCC, Arduino, ESP8266, RaspberryPi, Domotica, Home Automation, MySensors" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico"> 
+
+		<link rel="stylesheet" type="text/css" href="resources/jovaDark.css" />
+	</head>
+	<body>
+		<div class="container">
+		
+			<section class="main">
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<div class="DocumentTitle">Build and Install the MCC MySensorsGateWay
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Build and Flash the MySensorsGateWay.</h1>
+
+<p>Follow <a target="newTarget" href="https://github.com/WSNhub/MySensorsGateway/wiki/The-Smart-Gateway">https://github.com/WSNhub/MySensorsGateway/wiki/The-Smart-Gateway</a> from chapter "Serial connection to the ESP" on.
+
+<h2>Serial connection to the ESP</h2>
+
+<p>I skipped this because I have already pyserial. See higher up I installed already python-serial and this look the same/related.
+<pre>
+johan@ESPDEV:~$ dpkg --list | grep -i serial
+ii  python-serial                       2.6-1build1                      all          pyserial - module encapsulating access for the serial port
+</pre>
+
+<p>SKIPPED:
+<p>When flashing is complete, a serial connection to the ESP will be set up. This allows you to enter commands to for example check the state of the ESP. The tool used for that is a python tool which probably is not installed on your system yet. First we are going to install pip for python, a tool that lets you easily install python extensions:
+<pre>
+    sudo apt-get install python-pip
+</pre>
+
+<p>Next we install the actual pyserial extension:
+<pre>
+    sudo pip install pyserial --upgrade
+</pre>
+
+<p>More information on this topic can be found on the adafruit website: <a target="newTarget" href="https://learn.adafruit.com/arduino-lesson-17-email-sending-movement-detector/installing-python-and-pyserial">https://learn.adafruit.com/arduino-lesson-17-email-sending-movement-detector/installing-python-and-pyserial</a>
+
+<p>So what I don't have is <code>python-pip</code>.
+
+
+
+<h2>Building the firmware</h2>
+<p>Building the firmware can be done in a few steps. First of all the repository should be cloned.
+<pre>
+    From my home directory:
+    mkdir MCC
+    cd MCC
+    git clone https://github.com/WSNhub/MySensorsGateway.git
+</pre>
+
+<p>Next step is to fetch all libraries like Sming, the MySensors and SD card library. This is automatically done when executing the setup script.
+<pre>
+    cd MySensorsGateway
+    ./setup.sh
+</pre>
+
+<p>Note: After the exit from the setup.h, the current directory is <code>/home/USER/MCC/MySensorsGateway</code>
+
+<p>Now that the setup is done, a simple "make" will build the source. When this is done, the 3 firmware files are ready.
+<pre>
+    make
+</pre>
+
+
+
+<h3>Common pitfalls</h3>
+<p>sudo adduser YOUR_USER dialout
+<p>I already did: sudo adduser johan dialout
+
+
+
+<h2>Flashing the firmware</h2>
+
+<p>Connect the NodeMCU to the HPTOVO4.
+
+<p>Check USB devices.
+<pre>
+johan@ESPDEV:~/MCC/MySensorsGateway$ lsusb
+Bus 001 Device 003: ID 10c4:ea60 Cygnal Integrated Products, Inc. CP210x UART Bridge / myAVR mySmartUSB light
+Bus 001 Device 002: ID 80ee:0021 VirtualBox USB Tablet
+Bus 001 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+</pre>
+<p>PASS: CP210x is there.
+
+<p>The first time an ESP8266 needs to be flashed via an USB cable. A simple "make flash" will transfer the images by using esptool, a tool that is incorporated in the toolchain. Do note that on WeMos the flashing does not need any extra hardware manipulation while on other platforms it might be necessary to press a flash button while resetting the module. Once you found out what manipulation is needed, flashing comes down to:
+<pre>
+    make flash
+</pre>
+
+
+
+<p>It is also possible to do the flashing manually bu using esptool directly. It is however important to use the correct arguments here.
+<pre>
+/opt/esp-open-sdk/esptool/esptool.py -p /dev/ttyUSB0 -b 115200 write_flash -ff 40m -fm qio -fs 32m 0x00000 out/firmware/rboot.bin 0x02000 out/firmware/rom0.bin 0x100000 out/firmware/spiff_rom.bin
+</pre>
+<p>This is execatly the same command as was launched by <code>make flash</code> on my system.
+
+<p>JOVA: TODO: Now the default value of QIO iso DIO was used and all looks OK. So what about the need for DIO?
+
+<p>After that the firmware can be flashed over-the-air. The gateway will download the firmware via HTTP from a webserver.
+
+
+
+<p>It is possible to use the opened terminal. Enter help, info, ...
+
+<p>Reset the NodeMCU and see the log on the terminal. See file:
+
+
+<p>Quit the terminal with CTRL - Alt - ]
+  <br>Note: NOT Alt-Gr!!!
+
+<p>After flashing a connection to the serial interface is automatically attempted. There is however a way to connect manually:
+<pre>
+python -m serial.tools.miniterm /dev/ttyUSB0 115200
+</pre>
+<p>When connecting fails (on modules with a cheap USB chip) a workaround that might work is:
+<pre>
+python -m serial.tools.miniterm /dev/ttyUSB0 9600
+CTRL-]
+python -m serial.tools.miniterm /dev/ttyUSB0 115200
+</pre>
+
+
+
+<h2>The web configuration interface</h2>
+
+<p>When the system starts it starts an access point and starts a webserver. The SSID of the access point is built out of "MySensors gateway " and the unique id of this system "System Chip ID : dc0f28". In the above example this results in "MySensors gateway dc0f28". Currently there is no way to change that, but it could be added. By default there is no password so you can connect to it and use the ip 192.168.4.1 for http and telnet. The web configuration will allow you to set up your network configuration, an AP password and MQTT settings. When all is set up properly the gateway can connect to an MQTT server in order to communicate with the controller.
+
+<p>With the Wifi configuration on my HPTOVO4, check available networks.
+<p>"MySensors gateway 23389" exists.
+
+
+
+<p>With tablet, connect to network "MySensors gateway 23389".
+<p>Surf to: 192.168.4.1
+  <br>PASS: Configuration page shows.
+
+
+<p>Configure SSID and password of jefke524. Click Verzenden.
+<p>Check BBOX router.
+  <br>PASS: ESP_023389 is connected. The NodeMCU has an IP address.
+
+
+<pre>
+Start Sensor Node.
+
+
+Start HiveMQ on HPTOVO4, wait a minute. Allow firewall...
+
+
+Configure MQTT parameters in the gateway:
+Now surf via the jefke524 network to 192.168.1.167 (== the gatewap IP address)
+IP Address fo MQTT server: IP address of HPTOVO4
+Port of MQTT server: 1883
+
+
+Start TT3 MQTT Client for test.
+Connect to HiveMQ.
+Subscribe to #
+The result:
+See repeated messages every minute, coming from the gateway:
+- /ESP_00023389/version
+- /memory
+</pre>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<br>
+<div class="footer">
+Copyright: 2016 - Johan Vanroose
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+			</section>
+
+
+
+		</div>
+
+
+
+	</body>
+</html>
+
+
+
+

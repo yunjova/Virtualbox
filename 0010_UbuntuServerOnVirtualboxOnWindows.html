@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en" class="jovaDark">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Install Linux Ubuntu Server in Virtualbox on Windows 10</title>
+
+		<meta name="description" content="Sensor / Actuator Nodes based on MySensors and MCC" />
+		<meta name="keywords" content="MCC, Arduino, ESP8266, RaspberryPi, Domotica, Home Automation, MySensors" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico"> 
+
+		<link rel="stylesheet" type="text/css" href="resources/jovaDark.css" />
+	</head>
+	<body>
+		<div class="container">
+		
+			<section class="main">
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<div class="DocumentTitle">Install Linux Ubuntu Server in Virtualbox on Windows 10
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Introduction.</h1>
+<p>Use Virtualbox on Windows to create a Linux machine to do development for the sensor network.
+
+<p>This page describes the setup of a Linux virtual machine to be able to development for the sensor network on Linux even if you only have a Windows real machine. The advantage is that a person with a Windows machine can develop using the same environment as the rest of the group.
+
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Components.</h1>
+<ul>
+  <li>Oracle Virtualbox (<a target="newTarget" href="http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe">http://download.virtualbox.org/virtualbox/5.0.14/VirtualBox-5.0.14-105127-Win.exe</a>). The extension pack is not needed.
+  <li>Ubuntu Server 1404LTS (<a target="newTarget" href="http://www.ubuntu.com/download/server">http://www.ubuntu.com/download/server</a> ubuntu-14.04.3-server-amd64.iso) I used Ubuntu Server (not Desktop) because the esp-open-sdk developers use this OS.
+  <li>ESP Open SDK (<a target="newTarget" href="https://github.com/pfalcon/esp-open-sdk">https://github.com/pfalcon/esp-open-sdk</a>) Recommended in <a target="newTarget" href="http://www.esp8266.com/wiki/doku.php?id=toolchain">http://www.esp8266.com/wiki/doku.php?id=toolchain</a>.
+</ul>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Create a Vitual Machine with Ubuntu Server.</h1>
+
+<p>A note in advance: You can always backup the VM, see below: "Backup the VM using Clone".
+
+<h2>Hardware acceleration on the host machine.</h2>
+<p>Check the hardware acceleration on the host machine.
+
+<p>I could install and run a VM without any VT-x problem.
+<p>However when, after a complete shutdown of the VM and Virtualbox, I could not start the VM and got the next error:
+<code>VT-x/AMD-V hardwareversnelling is niet beschikbaar op uw systeem. Uw 64-bit gast zal geen 64-bit CPU detecteren en niet in staat zijn op te starten.</code>
+<p>After a reboot of the host machine, I was able to restart the VM... sometimes, sometimes not.
+<p>VT-x seems available, I checked with CPU-Z, my CPU has VT-x.
+
+<p>Check the BIOS. Virtualization was not enbled, enable it.
+  <br>This solves the problem.
+
+<p>QUESTION: Why was it sometimes working and sometimes not?
+
+<h2>Install Virtualbox.</h2>
+<p>Launch the Virtualbox installer. Follow the instructions.
+<p>Make sur you install USB stuff.
+
+<h2>Create a new machine.</h2>
+<ul>
+  <li>Launch Virtualbox
+
+  <li>Click New machine
+    <p>Check/fill in parameters as shown below:
+    <pre>
+  Name: Ubuntu1404LTS
+  Type: 64-bit
+  RAM: 768 MB (== the default, which I kept. It seems 348 MB would also have been OK)
+  Add new virtual disk (default is 8 GB)
+  Type: VDI
+  Allcation type: Change to Fixed (longer to create, faster to use)
+  Changed size to: 16 GB (from 8GB default)
+    Comes in: C:\Users\USER\VirtualBox VMs\Ubuntu1404LTS\Ubuntu1404LTS.vdi.
+    </pre>
+
+  <p>The machine is created and in power-off state.
+</ul>
+
+
+
+<h2>Install Ubuntu Server.</h2>
+<ul>
+  <li>Select Ubuntu install CD
+    <pre>
+  Select Settings
+  Select Storage
+  Add new storage connection
+    Virtual Optical Station
+    Choose the downloaded Ubuntu.iso file.
+  System boot order: Put Optical drive on top.
+  Close the settings window.
+    </pre>
+
+  <li>Start the machine
+    <p>Messages: <code>Auto keyboard capture is turned on</code>. <code>Host OS supports mouse integration</code>.
+    <pre>
+  Select language: English
+  Install Ubuntu Server
+  English
+  Europe Belgium
+  Locale settings: United States
+  Keyboard: Belgian, Belgian
+    </pre>
+
+    <pre>
+  Hostname: ESPDEV
+  Full name for the user: Johan
+  Account name: johan
+  Encrypt home directory: No
+  Timezone: Europe/Brussels
+  Partitioning method: Guided - use entire disk and set up LVM
+  Partition size: I selected the maximum available size. TODO: Check if selecting a part would have been better. This will give more flexibility. But how much to choose then?
+  Results: 
+  Write to disk: Yes
+  HTTP Proxy: Left blank
+  No automatic updates
+    </pre>
+
+  <li>Additional software to install
+    <pre>
+  OpenSSH server
+    </pre>
+
+    <pre>
+  Install GRUB: Yes
+    </pre>
+
+  <p>The machine reboots now.
+    <br>Apparantly the .iso file is not mounted anymore and the machine boots from the VHD. OK
+
+  <li>Get the newest software
+    <p>Note see below for how to "Avoid to have to type password at each sudo".
+    <pre>
+  sudo apt-get update
+  sudo apt-get dist-upgrade
+    </pre>
+
+  <li>Verify USB devices
+    <pre>
+  Devices -> USB
+    </pre>
+    <p>USB devices are seen (also the NodeMCU device).
+</ul>
+
+
+
+<h2>Install Guest Additions.</h2>
+<p>To be able to use USB from the VM, the VM needs Virtual Guest Additions (altough USB devices are seen in Virtualbox).
+
+<p>Follow: <a target="newTarget" href="https://www.virtualbox.org/manual/ch04.html">https://www.virtualbox.org/manual/ch04.html</a>
+  Install Guest Additions
+<pre>
+  sudo apt-get update
+  sudo apt-get upgrade
+  sudo apt-get install dkms
+  sudo shutdown -r now
+  Insert the VBoxGuestAdditions.iso CD file into your Linux guest's virtual CD-ROM drive, exactly the same way as described for a Windows guest in Section 4.2.1.1, “Installation”.
+  sudo mount /dev/cdrom /media/cdrom
+  sudo apt-get install -y dkms build-essential linux-headers-generic linux-headers-$(uname -r)
+  Change to the directory where your CD-ROM drive is mounted and execute as root:
+  ls /media/cdrom
+  cd /media/cdrom
+  sudo sh ./VBoxLinuxAdditions.run
+  Need to reboot.
+  sudo shutdown -r now
+PASS: Installed
+
+lsusb
+PASS: Shows NodeMCU device now (CP210x)
+</pre>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Avoid to have to type password at each sudo.</h1>
+  <pre>
+  sudo visudo
+  
+  Changed
+  %admin ALL=(ALL) ALL
+  to
+  %admin ALL=(ALL) NOPASSWD: ALL
+  
+  # Allow members of group sudo to execute any command
+  Changed
+  %sudo   ALL=(ALL:ALL) ALL
+  to
+  %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+  </pre>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Backup the VM using Clone.</h1>
+<p>You can clone the machine as a backup.
+<ul>
+  <li>First shutdown the VM
+    <pre>
+   sudo sutdown - h now
+    </pre>
+
+  <li>With the clone feature of Virtualbox (it takes & while to complete!). (You could also copy the .vbox and .vdi files)
+    <pre>
+  Machine -> Clone
+    Name: Ubuntu1404LTS Clone BU 02
+    I selected to give new MAC addresses, so it is also another machine.
+    Full clone.
+    </pre>
+</ul>
+  <p>Note: The virtual machine is stored in: <code>C:\Users\USER\VirtualBox VMs\Ubuntu1404LTS Clone BU 02</code>
+  <p>You still need to update the hostname (and maybe other things?) to have another machine.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Update/Upgrade.</h1>
+
+<p>I first do an udpate/upgrade.
+    <pre>
+  sudo apt-get update
+  sudo apt-get upgrade
+  sudo apt-get dist-upgrade
+    </pre>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>SSH into the new VM (SSH access to the Guest).</h1>
+<p>With PuTTY, make an SSH connection to the VM.
+<p>This fails altough the SSH server is running and is accepting connections.
+<pre>
+Is the SSH server running?
+ps -A | grep -i ssh
+PASS: Yes
+
+VM:
+Does the SSH server listen for incoming connections?
+sudo ss -lnp | grep sshd
+PASS: Two lines on port 22 (IPv4 and IPv6)
+
+Try to connect from the VM to the VM.
+ssh -v localhost
+PASS: I can login.
+
+Leave the session.
+exit
+
+Firewall tables
+VM:
+iptables -nvl INPUT
+</pre>
+
+<p>So on the VM side all looks OK. What is wrong? 
+<p>The reason the that the default type of network port is NAT.
+<p>You must first define port forwarding.
+<pre>
+Define Port Fowarding
+Network -> Advanced -> Port Forwarding
+Add one entry:
+127.0.0.1:2222 to 10.0.2.15:22
+Restart the VM
+PuTTY to 127.0.0.1:2222
+PASS: Connected to ssh server.
+</pre>
+
+<p>Even better is to configure a Brigded type adapter instead of a NAT adapter. Then the VM is, from the network perspective, connected in the "normal" way.
+  <br>See: Configure a Bridged Adapter on the VM
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Configure Bridged a Adapter on the VM.</h1>
+<p>Important: The Bridged adapter (2nd one in my case) only gets an IP address when I disable the NAT Adapter (1st one in my case). So disable the NAT adapter.
+<p>Connected with PuTTY SSH to port 22: PASS.
+<p>Internet access from VM (ping www.google.com): PASS.
+<p>Connection between host and guest (ping from each other): PASS.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>SFTP</h1>
+<p>FileZilla from host to guest as USER.
+<p>Directory: /home/USER
+<p>PASS: (SFTP is enabled by default)
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Add a user with sudo rights.</h1>
+#Add a User
+sudo adduser USER
+
+#Grant the User Sudo Privileges
+sudo visudo
+# User privilege specification
+...
+USER ALL=(ALL:ALL) ALL
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Give the root user a password.</h1>
+<p>In Ubuntu by default the root user has no password. You cannot login as root or do su.
+<p>There is no need to become root anyway, so this is good, keep it this way.
+
+<p>I you ever want to give the root user a password, then do:
+<pre>
+#Set an unencrypted password
+sudo usermod -p password root
+
+#Set an encrypted password
+sudo passwd root
+</pre>
+
+<p>More on sudo and root access: <a target="newTarget" href="https://help.ubuntu.com/community/RootSudo">https://help.ubuntu.com/community/RootSudo</a>
+  RootSudo
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Key-based login for users.</h1>
+<p>Key, public key, private key.
+<p>See key_info.html for the steps.
+
+<p>More info:
+
+<p><a target="newTarget" href="http://www.chiark.greenend.org.uk/~sgtatham/putty/">http://www.chiark.greenend.org.uk/~sgtatham/putty/</a>
+  PuTTY: a free SSH and Telnet client
+
+<p><a target="newTarget" href="https://www.howtoforge.com/how-to-configure-ssh-keys-authentication-with-putty-and-linux-server-in-5-quick-steps">https://www.howtoforge.com/how-to-configure-ssh-keys-authentication-with-putty-and-linux-server-in-5-quick-steps</a>
+  How To Configure SSH Keys Authentication With PuTTY And Linux Server In 5 Quick Steps
+
+<p><a target="newTarget" href="https://www.digitalocean.com/community/tutorials/how-to-use-pageant-to-streamline-ssh-key-authentication-with-putty">https://www.digitalocean.com/community/tutorials/how-to-use-pageant-to-streamline-ssh-key-authentication-with-putty</a>
+  How To Use Pageant to Streamline SSH Key Authentication with PuTTY
+  GOOD!!!
+  
+<p><a target="newTarget" href="http://www.unixwiz.net/techtips/ssh-agent-forwarding.html">http://www.unixwiz.net/techtips/ssh-agent-forwarding.html</a>
+  An Illustrated Guide to SSH Agent Forwarding
+  GOOD!!!
+
+<p><a target="newTarget" href="https://www.getfilecloud.com/blog/ssh-without-password-using-putty/">https://www.getfilecloud.com/blog/ssh-without-password-using-putty/</a>
+  SSH (Secure Shell) without password using Putty
+
+<p><a target="newTarget" href="http://www.tecmint.com/ssh-passwordless-login-with-putty/">http://www.tecmint.com/ssh-passwordless-login-with-putty/</a>
+  Configure “No Password SSH Keys Authentication” with PuTTY on Linux Servers
+
+<p><a target="newTarget" href="http://www.servermom.org/passwordless-ssh-login/1608/">http://www.servermom.org/passwordless-ssh-login/1608/</a>
+  How to Passwordless SSH Login
+
+<p>TODO: Need to clean this up.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>2016-03-02 - Access Windows host shared folders from the Ubuntu guest.</h1>
+<p>You must have Guest Additions
+
+<p>Define the shared folders:
+<pre>
+Devices -> Shared folders -> +
+  Path: C:\Users\Johan\Documents\CloudMEGA\00000000_MCC_MySensors (Path in Windows)
+  Folder name: 00000000_MCC_MySensors (This is the name to use in Linux)
+</pre>
+<p>Check Auto-mount to mount the folder immediatelly. (I did not do this)
+<p>Check Make Permanent to mount after each reboot. (I did not do this)
+
+<p>Manually mount the shared folders:
+
+<p>First create a mountpoint:
+<pre>
+johan@ESPDEV:~$ ls /media
+cdrom
+
+sudo mkdir /media/windowsShares
+
+sudo mount -t vboxsf 00000000_MCC_MySensors /media/windowsShares
+johan@ESPDEV:~$ sudo mount -t vboxsf 00000000_MCC_MySensors /media/windowsShares
+</pre>
+<p>Now I can access/read/write files in the Windows folder from within the virtual box.
+  <br>E.g. vi /media/windowsShares/table.css
+  <br>Note: A file .table.css.swp was created.
+
+<p>Oops I want the directory name in the path on the VM.
+<p>So I should do a:
+<pre>
+mkdir /media/windowsShares/00000000_MCC_MySensors
+sudo mount -t vboxsf 00000000_MCC_MySensors /media/windowsShares/00000000_MCC_MySensors
+</pre>
+
+<p>You can use /etc/init.d/rc.local to execute these commands at every startup. (Not done yet.)
+
+<p>Note: In recent versions of Ubuntu on Virtualbox.
+
+
+
+<p>Reboot the VM.
+<p>The Windows files are not visible anymore - as is expected.
+
+
+==========
+<p>So now check the Auto-mount and Make Permanent boxes. (Edit shared folder Devices -> Shared folders)
+<p>No change, the mount did not happen.
+<pre>
+Even the folder 00000000_MCC_MySensors in /media/windowsShares is not there.
+
+Try this:
+johan@ESPDEV:~$ sudo mount -t vboxsf 00000000_MCC_MySensors /media/windowsShares/00000000_MCC_MySensors
+/sbin/mount.vboxsf: mounting failed with the error: No such file or directory
+
+johan@ESPDEV:~$ mkdir /media/windowsShares/00000000_MCC_MySensors
+mkdir: cannot create directory ‘/media/windowsShares/00000000_MCC_MySensors’: Permission denied
+
+johan@ESPDEV:~$ sudo ls -l /media/windowsShares/
+total 0
+
+WHAT!?
+
+johan@ESPDEV:~$ cd /media/windowsShares/
+johan@ESPDEV:/media/windowsShares$ ls -al
+total 8
+drwxr-xr-x 2 root root 4096 Mar  2 20:19 .
+drwxr-xr-x 5 root root 4096 Mar  2 20:39 ..
+johan@ESPDEV:/media/windowsShares$ mkdir xxx
+mkdir: cannot create directory ‘xxx’: Permission denied
+johan@ESPDEV:/media/windowsShares$ ls -a
+.  ..
+johan@ESPDEV:/media/windowsShares$ cd ..
+johan@ESPDEV:/media$ ls -al
+total 28
+drwxr-xr-x  5 root root    4096 Mar  2 20:39 .
+drwxr-xr-x 22 root root    4096 Feb 18 21:40 ..
+drwxr-xr-x  2 root root    4096 Feb 18 20:48 cdrom
+drwxrwx---  1 root vboxsf 12288 Mar  2 20:30 sf_00000000_MCC_MySensors
+drwxr-xr-x  2 root root    4096 Mar  2 20:19 windowsShares
+
+
+OK, the auto-mount happens in /media and prepends the string sf_
+
+
+johan@ESPDEV:/media$ cd sf_00000000_MCC_MySensors/
+-bash: cd: sf_00000000_MCC_MySensors/: Permission denied
+
+
+I need access rights, so add myself to the group vboxsf.
+
+USE
+sudo adduser johan vboxsf
+OR
+sudo usermod -a -G vboxsf johan
+?
+
+I used: sudo usermod -a -G vboxsf johan this time
+  I used thr adduser command for the USB dialout.
+
+
+johan@ESPDEV:/media$ sudo usermod -a -G vboxsf johan
+johan@ESPDEV:/media$ cd sf_00000000_MCC_MySensors/
+-bash: cd: sf_00000000_MCC_MySensors/: Permission denied
+johan@ESPDEV:/media$ groups johan
+johan : johan adm dialout cdrom sudo dip plugdev lpadmin sambashare vboxsf
+
+FAIL again.
+
+The other command:
+johan@ESPDEV:/media$ sudo adduser johan vboxsf
+The user `johan' is already a member of `vboxsf'.
+
+
+
+So use manual mount and use /etc/init.d/rc.local if needed.
+
+
+
+Remove the share devices -> shared folders
+reboot the VM
+
+johan@ESPDEV:~$ cd /media/windowsShares/
+johan@ESPDEV:/media/windowsShares$ ls
+johan@ESPDEV:/media/windowsShares$ cd ..
+johan@ESPDEV:/media$ ls
+cdrom  sf_00000000_MCC_MySensors  windowsShares
+johan@ESPDEV:/media$ cd sf_00000000_MCC_MySensors/
+johan@ESPDEV:/media/sf_00000000_MCC_MySensors$ ls
+00000000_MCC_MySensors
+001_SensorNode_LedNodeWithFeedback
+jovaDark.css
+.....
+
+Woow a submap 00000000_MCC_MySensors is created in 00000000_MCC_MySensors.
+Probably because the two mounts at different mount points.
+
+
+See UID, ... of a user:
+id johan
+
+
+2016-03-03
+Delete:
+- C:\Users\Johan\Documents\CloudMEGA\00000000_MCC_MySensors\00000000_MCC_MySensors
+- .table.css.swp
+</pre>
+
+
+
+<p>Create a permanent share:
+<pre>
+On Windows:
+  create a new directory:
+    C:\Users\Johan\Documents\CloudMEGA\_SHARED02
+
+In Virtualbox:
+  define a shared folder:
+    Settings -> Shared Folders -> +
+      Path to folder: C:\Users\Johan\Documents\CloudMEGA\_SHARED02
+      Folder name: shared02
+      Auto-mount: Unchecked
+      Make Permanent: Unchecked
+
+In Guest:
+  Mount the share
+    sudo mkdir /media/windowsShares/shared02
+    sudo mount -t vboxsf shared02 /media/windowsShares/shared02
+
+  Test:
+    touch test01.txt
+    This file is visible in Windows.
+    Edits in either system are visible on the other one, so PASS.
+
+  Reboot
+    Mount
+      cd /media/windowsShares/shared02
+
+      ls
+        No files visible. This is normal, first need to mount.
+
+      sudo mount -t vboxsf shared02 /media/windowsShares/shared02
+
+      ls
+        NO FILES VISIBLE!!! WHY???
+
+      ls /media/windowsShares/shared02
+        File test01.txt is there
+      
+      WHAT!!!???
+
+      cd
+      cd /media/windowsShares/shared02
+      ls
+        File test01.txt is there
+
+      So need to cd into it AFTER the mount.
+</pre>
+
+<p>To unmount:
+<pre>
+umount -f /media/windowsShares/shared02
+rm -rf /media/windowsShares/shared02 (This is not (always?) required.)
+</pre>
+
+
+
+<p>Mount it automatically after a reboot.
+
+<p>Use /etc/init.d/rc.local to execute these commands at every startup.
+
+<p>Added the line below as last line to /etc/init.d/rc.local:
+<pre>
+mount -t vboxsf shared02 /media/windowsShares/shared02
+</pre>
+
+<p>Reboot the guest.
+
+<p>Verify:
+<pre>
+ls /media/windowsShares/shared02
+</pre>
+<p>PASS: test01.txt is there
+
+
+<p>After closing the Virtualbox program and restarting it again, the definition for the shared folder was gone.
+<p>Check the flag Make Permanent to make the definition survive a restart of the Virtualbox program.
+  <br>The definition moves from "Temporary" to "Machine".
+
+<p>Note: The files them selves are stored on the Windows host OS.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1 id="[Project]Accessing Guest Files from Windows - Setting up a SAMBA Server.">Accessing Guest Files from Windows - Setting up a SAMBA Server.</h1>
+<p>2016-03-03
+<p>Follow: <a target="" href="http://theurbanpenguin.com/wp/index.php/setting-up-a-samba-server-on-raspberry-pi/">http://theurbanpenguin.com/wp/index.php/setting-up-a-samba-server-on-raspberry-pi/</a>
+  Setting up a SAMBA Server on Raspberry Pi
+  <br>[L] <a target="" href="../RaspberryPiInfo/Setting up a SAMBA Server on Raspberry Pi - theurbanpenguin.html">../RaspberryPiInfo/Setting up a SAMBA Server on Raspberry Pi - theurbanpenguin.html</a>
+
+<p>STEPS:
+<pre>
+  Installing Samba
+    sudo apt-get update
+    sudo apt-get install samba samba-common-bin
+
+  Creating a directory to share
+    sudo mkdir -m 1777 /data
+
+  Edit the Samba Configuration, smb.conf
+    Command in the guide is wrong, must be a dot iso a slash before the date part.
+    sudo mv /etc/samba/smb.conf /etc/samba/smb.conf/$(date +%F)
+    Good:
+    sudo mv /etc/samba/smb.conf /etc/samba/smb.conf.$(date +%F)
+
+  Open shell with root priviledges
+    sudo bash
+
+  Copy back the relavant part of the file
+    ls /etc/samba/
+      gdbcommands  smb.conf.2016-03-03  tls
+
+    cd /etc/samba/
+
+    grep -ve ^# -ve '^;' -ve ^$ smb.conf.2016-03-03 > smb.conf
+
+  Adding a share definition
+    Edit (vi) /etc/samba/smb.conf
+    [data]
+      comment = Data share
+      path = /data
+      browseable = yes
+      read only = no
+    and save.
+
+  Restart the service with testparm (/usr/bin/testparm)
+    Test
+      testparm
+
+    Real restart
+      service samba restart
+
+  Creating samba users
+    smbpasswd -a johan PASSWORD
+
+  List Samba users
+    pdbedit -L
+
+  Testing the connection with smbclient
+
+    List shares
+      smbclient -L localhost
+      The smbslient is not present, needs to be installed via apt-get.
+      I did not do this.
+
+  Exit the sudo shell.
+    exit
+
+The Samba shares will be visible from Windows now
+  On Windows, open a new Explorer window and in the address bar type
+    \\IP_ADDRESS_OF_GUEST
+  The data directory is seen now.
+
+</pre>
+
+<p>Edits in either system are visible on the other one, so PASS.
+
+<p>Note: The files them selves are stored on the Linux guest OS.
+
+<p>Note: Add other Samba shares later if needed.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Interesting Linux Commands.</h1>
+
+<p>TODO: To be completed.
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<br>
+<div class="footer">
+Copyright: 2016 - Johan Vanroose
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+			</section>
+
+
+
+		</div>
+
+
+
+	</body>
+</html>
+
+
+
+

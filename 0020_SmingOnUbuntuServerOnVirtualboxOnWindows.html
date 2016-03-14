@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" class="jovaDark">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Install Sming on Linux Ubuntu Server in Virtualbox on Windows 10</title>
+
+		<meta name="description" content="Sensor / Actuator Nodes based on MySensors and MCC" />
+		<meta name="keywords" content="MCC, Arduino, ESP8266, RaspberryPi, Domotica, Home Automation, MySensors" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico"> 
+
+		<link rel="stylesheet" type="text/css" href="resources/jovaDark.css" />
+	</head>
+	<body>
+		<div class="container">
+		
+			<section class="main">
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<div class="DocumentTitle">Install Sming on Linux Ubuntu Server in Virtualbox on Windows 10
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Introduction.</h1>
+<p>Use Virtualbox on Windows to create a Linux machine to do development for the sensor network.
+
+<p>This page describes the setup of a Linux virtual machine to be able to development for the sensor network on Linux even if you only have a Windows real machine. The advantage is that a person with a Windows machine can develop using the same environment as the rest of the group.
+
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Components.</h1>
+<ul>
+  <li>Oracle Virtualbox
+  <li>Ubuntu Server 1404LTS
+  <li>ESP Open SDK (<a target="newTarget" href="https://github.com/pfalcon/esp-open-sdk">https://github.com/pfalcon/esp-open-sdk</a>) Recommended in <a target="newTarget" href="http://www.esp8266.com/wiki/doku.php?id=toolchain">http://www.esp8266.com/wiki/doku.php?id=toolchain</a>.
+  <li>Sming
+</ul>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Create a Vitual Machine with Ubuntu Server.</h1>
+
+<p>See: <a target="newTarget" href="UbuntuServerOnVirtualboxOnWindows.html">UbuntuServerOnVirtualboxOnWindows.html</a>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h1>Install ESP8266 development environment (Sming and dependencies).</h1>
+
+<p>Steps taken:
+
+<p>Basically I followed: <a target="newTarget" href="https://github.com/SmingHub/Sming/wiki/Linux-Quickstart">https://github.com/SmingHub/Sming/wiki/Linux-Quickstart</a>
+  Sming - Linux Quickstart
+  but with some changes:
+  <ul>
+    <li>ERROR: libtool-bin has no installation candidate (Only for Kubuntu? So omitted this.)
+    <li>build-essential was missing in the prerequisites (On Ubuntu <b>server</b>, not Desktop.)
+  </ul>
+
+<ul>
+  <li>Install prerequisites
+  <pre>
+  sudo apt-get update
+
+  sudo apt-get install make unrar autoconf automake libtool gcc g++ gperf flex bison texinfo gawk ncurses-dev libexpat-dev python sed python-serial srecord bc git
+  </pre>
+
+  <li>Prepare directory
+  <pre>
+  mkdir -p /opt/
+  cd /opt/
+  </pre>
+
+  <li>Build esp-open-sdk (Or get precompiled esp-open-sdk (64-bit) or (32-bit))
+  <pre>
+  sudo git clone https://github.com/pfalcon/esp-open-sdk.git
+  cd esp-open-sdk
+  sudo make STANDALONE=y # It will take a while...
+  </pre>
+  <p>ERROR
+
+  <p>Dependencies were missing:
+  <p>Follow parts of: <a target="newTarget" href="http://www.penninkhof.com/2015/03/esp8266-open-sdk/">http://www.penninkhof.com/2015/03/esp8266-open-sdk/</a>
+  <li>Install additionally needed dependencies
+  <pre>
+  sudo apt-get install build-essential
+
+  # Are these needed? (I have installed them):
+  #sudo apt-get -y install libncurses5-dev wget libc6-dev-amd64 dpkg-dev 
+  </pre>
+
+  <li>Do clean/update:
+  <pre>
+  cd /opt/esp-open-sdk
+  make clean
+  git pull
+  git submodule update
+  </pre>
+
+  <li># Install the esp-open-sdk toolchain
+  <pre>
+  cd /opt
+  sudo rm -rf esp-open-sdk
+  sudo git clone https://github.com/pfalcon/esp-open-sdk.git
+  sudo chown -R USER esp-open-sdk
+  cd esp-open-sdk
+  make STANDALONE=y
+  </pre>
+
+  <li>Paths:
+  <pre>
+  echo 'PATH=$PATH:/opt/esp-open-sdk/xtensa-lx106-elf/bin' >> ~/.profile
+  PATH=$PATH:/opt/esp-open-sdk/xtensa-lx106-elf/bin
+
+  echo 'PATH=$PATH:/opt/esp-open-sdk/esptool' >> ~/.profile
+  PATH=$PATH:/opt/esp-open-sdk/esptool
+  </pre>
+
+  <li>Environment variables:
+  <pre>
+  echo 'export ESP_HOME=/opt/esp-open-sdk' >> ~/.profile
+  export ESP_HOME=/opt/esp-open-sdk
+
+  echo' export SMING_HOME=~/Sming/Sming' >> ~/.profile
+  export SMING_HOME=~/Sming/Sming
+  </pre>
+
+  <li>Get and Build Sming Core:
+  <pre>
+  cd ~
+  git clone https://github.com/SmingHub/Sming.git
+  cd Sming/Sming
+  make
+  </pre>
+
+  <li>Build spiffy (if required):
+  <pre>
+  cd ~/Sming/Sming
+  make spiffy
+  </pre>
+
+  <li>Install esptool.py:
+  <pre>
+  cd ~
+  sudo apt-get install python-serial unzip
+  wget https://github.com/themadinventor/esptool/archive/master.zip
+  unzip master.zip
+  mv esptool-master /opt/esp-open-sdk/esptool
+  rm master.zip
+  </pre>
+
+  <li>Get esptool2 from <a target="newTarget" href="https://github.com/raburton/esptool2">https://github.com/raburton/esptool2</a>
+  <pre>
+  cd ~
+  git clone https://github.com/raburton/esptool2.git
+  cd esptool2
+  make
+  sudo cp esptool2 /usr/bin
+  </pre>
+
+  <li>Verify toolchain.
+  <p>Build a 'Basic Blink' example:
+  <pre>
+  cd ~/Sming/samples/Basic_Blink
+  make
+  </pre>
+  <p>PASS: 0x00000.bin and 0x09000.bin exist.
+
+  <p>Must use DIO iso QIO
+    <br>Must edit Makefile-user.mk
+  <pre>
+  Change
+  # SPI_MODE = dio
+  to
+  SPI_MODE = dio
+  </pre>
+
+  <li>Build and flash a 'Basic Blink' example (using ttyUSB0):
+  <pre>
+  cd ~/Sming/samples/Basic_Blink
+  make flash
+  </pre>
+
+  <p>When: FAIL: Cannot connect, not found.
+  <pre>
+  # Check USB Devices
+  lsusb
+  </pre>
+  <p>Configure:
+  <pre>
+  Apparaten -> USB -> Instellingen USB -> Add filter: CP210x
+  </pre>
+
+  <p>When: FAIL: Permission denied
+    <br>Need to add my account to the user group dialout.
+  <pre>
+  ls -l /deb/ttyUSB0
+  sudo adduser USER dialout
+  </pre>
+
+  <p>When: FAIL: Still: Permission denied
+  <p>Remove and re-insert the NodeMCU from the USB port with the flash button pressed.
+  <p>Reboot the Linux guest.
+  <pre>
+  ls -l /deb/ttyUSB0
+  </pre>
+
+  <p>PASS: Code gets downloaded.
+  <p>Terminal opens.
+
+  <p>When LED does not blink: power-cycle the NodeMCU/ESP8266.
+
+</ul>
+
+<p>OK, Can use this environment to develop for the ESP8266.
+
+<hr>
+<p>Hit the reset (RST) button on the NodeMCU.
+  <br>FAIL: Nothing happens.
+  <br>QUESTION: What made this button dead?
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<br>
+<div class="footer">
+Copyright: 2016 - Johan Vanroose
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+			</section>
+
+
+
+		</div>
+
+
+
+	</body>
+</html>
+
+
+
+
